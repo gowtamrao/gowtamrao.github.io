@@ -2,10 +2,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
-// Hosted on GitHub Pages at https://gowtamrao.github.io/RaoWeb
-// If you move to a custom domain, set `site` to it and remove `base`.
+// Hosted on GitHub Pages at https://gowtamrao.github.io
+// If you add a custom domain, set `site` to it and add public/CNAME.
 export default defineConfig({
   site: 'https://gowtamrao.github.io',
-  base: '/RaoWeb',
   integrations: [sitemap()],
 });

@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 
-/** Prefix an internal path with the configured base (e.g. /RaoWeb). */
+/** Prefix an internal path with the configured base (empty at the domain root). */
 export function url(path = '/'): string {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   const p = path.startsWith('/') ? path : `/${path}`;
