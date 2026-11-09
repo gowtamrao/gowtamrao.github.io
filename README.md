@@ -1,9 +1,9 @@
-# NivasWeb — personal site & blog
+# RaoWeb — personal site & blog
 
 My personal website: a bio on the home page, plus posts grouped by the topics I find interesting.
 Built with [Astro](https://astro.build), deployed to GitHub Pages.
 
-**Live:** https://gowtamrao.github.io/NivasWeb/
+**Live:** https://gowtamrao.github.io/RaoWeb/
 
 ## Features
 - Animated home page: interactive constellation background, floating gradient blobs, typewriter headline
@@ -37,5 +37,5 @@ Push to `main` and the GitHub Action rebuilds and publishes the site (~1 min).
 ## Run locally
 ```bash
 npm install
-npm run dev      # http://localhost:4321/NivasWeb/
+npm run dev      # http://localhost:4321/RaoWeb/
 ```
