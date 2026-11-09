@@ -1,0 +1,30 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { topics } from '../data/site';
+import { url, formatDate, readingTime } from '../utils';
+interface Props { posts: CollectionEntry<'posts'>[]; showTopic?: boolean; }
+const { posts, showTopic = true } = Astro.props;
+const topicOf = (slug: string) => topics.find((t) => t.slug === slug);
+---
+{posts.length === 0 ? (
+  <p class="chip">Nothing here yet — first post coming soon ✍️</p>
+) : (
+  <ul class="post-list">
+    {posts.map((post) => {
+      const t = topicOf(post.data.topic);
+      return (
+        <li class="post-item reveal">
+          <a class="card" href={url(`/posts/${post.id}`)}>
+            <h3 transition:name={`post-${post.id}`}>{post.data.title}</h3>
+            <span class="post-meta">{formatDate(post.data.date)}</span>
+            <p>{post.data.description}</p>
+            <span class="post-meta" style="grid-column:1/-1">
+              {showTopic && t && <>{t.emoji} {t.name} · </>}{readingTime(post.body)} min read
+              {post.data.draft && ' · DRAFT'}
+            </span>
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+)}

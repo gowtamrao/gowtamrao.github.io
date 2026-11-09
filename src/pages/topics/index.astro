@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import TopicCard from '../../components/TopicCard.astro';
+import { topics } from '../../data/site';
+import { getPosts } from '../../utils';
+const posts = await getPosts();
+---
+<Base title="Topics" description="Topics I find interesting and write about.">
+  <section class="section">
+    <div class="container">
+      <div class="reveal">
+        <p class="eyebrow">Explore</p>
+        <h1 style="font-size:clamp(2.2rem,5vw,3.4rem);margin:6px 0 8px">Topics</h1>
+        <p style="color:var(--muted);max-width:600px;margin:0 0 36px">
+          Areas I am curious about, learning in public and trying to explain clearly. Pick one to dive in.
+        </p>
+      </div>
+      <div class="grid">
+        {topics.map((t) => <TopicCard topic={t} count={posts.filter((p) => p.data.topic === t.slug).length} />)}
+      </div>
+    </div>
+  </section>
+</Base>

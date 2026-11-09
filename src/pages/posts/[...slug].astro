@@ -1,0 +1,59 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { topics } from '../../data/site';
+import { getPosts, url, formatDate, readingTime } from '../../utils';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}
+type Props = { post: CollectionEntry<'posts'>; newer?: CollectionEntry<'posts'>; older?: CollectionEntry<'posts'> };
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+const topic = topics.find((t) => t.slug === post.data.topic)!;
+const toc = headings.filter((h) => h.depth === 2);
+---
+<Base title={post.data.title} description={post.data.description}>
+  <article class="section">
+    <div class="container narrow">
+      <a href={url(`/topics/${topic.slug}`)} class="chip">{topic.emoji} {topic.name}</a>
+      <h1 class="post-title" transition:name={`post-${post.id}`}>{post.data.title}</h1>
+      <p class="post-meta">
+        {formatDate(post.data.date)}
+        {post.data.updated && <> · updated {formatDate(post.data.updated)}</>}
+        {' · '}{readingTime(post.body)} min read
+      </p>
+      {toc.length > 2 && (
+        <details class="toc">
+          <summary>On this page</summary>
+          <ul>{toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ul>
+        </details>
+      )}
+      <div class="prose"><Content /></div>
+      {post.data.tags.length > 0 && (
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:40px">
+          {post.data.tags.map((t) => <span class="chip">#{t}</span>)}
+        </div>
+      )}
+      <nav class="pager">
+        {older ? <a class="card" href={url(`/posts/${older.id}`)}><small>← Older</small>{older.data.title}</a> : <span />}
+        {newer ? <a class="card right" href={url(`/posts/${newer.id}`)}><small>Newer →</small>{newer.data.title}</a> : <span />}
+      </nav>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .post-title { font-size: clamp(2rem, 5vw, 3rem); margin: 18px 0 10px; }
+  .toc { margin: 28px 0; padding: 14px 18px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-soft); }
+  .toc summary { cursor: pointer; font-weight: 600; }
+  .toc ul { margin: 10px 0 0; }
+  .pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 56px; }
+  .pager small { display: block; color: var(--muted); }
+  .pager .right { text-align: right; }
+  @media (max-width: 600px) { .pager { grid-template-columns: 1fr; } .pager .right { text-align: left; } }
+</style>

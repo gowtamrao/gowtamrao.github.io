@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { topics, type Topic } from '../../data/site';
+import { getPosts, url } from '../../utils';
+
+export function getStaticPaths() {
+  return topics.map((topic) => ({ params: { topic: topic.slug }, props: { topic } }));
+}
+const { topic } = Astro.props as { topic: Topic };
+const posts = (await getPosts()).filter((p) => p.data.topic === topic.slug);
+const others = topics.filter((t) => t.slug !== topic.slug);
+---
+<Base title={topic.name} description={topic.description}>
+  <section class="section">
+    <div class="container narrow">
+      <a href={url('/topics')} class="back">← All topics</a>
+      <div class="topic-hero">
+        <span class="big-emoji">{topic.emoji}</span>
+        <h1 transition:name={`topic-${topic.slug}`}>{topic.name}</h1>
+        <p>{topic.description}</p>
+      </div>
+      <PostList posts={posts} showTopic={false} />
+
+      <div class="others reveal">
+        <p class="eyebrow">Other topics</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          {others.map((t) => <a class="btn" href={url(`/topics/${t.slug}`)}>{t.emoji} {t.name}</a>)}
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .back { font-size: 0.95rem; }
+  .topic-hero { margin: 24px 0 40px; }
+  .big-emoji { font-size: 3.2rem; display: inline-block; animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-8px) rotate(-4deg); } }
+  h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); margin: 8px 0; }
+  .topic-hero p { color: var(--muted); font-size: 1.15rem; margin: 0; }
+  .others { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); }
+</style>

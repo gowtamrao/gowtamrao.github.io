@@ -1,0 +1,56 @@
+---
+import type { Topic } from '../data/site';
+import { url } from '../utils';
+interface Props { topic: Topic; count: number; }
+const { topic, count } = Astro.props;
+---
+<a class="card topic-card reveal" href={url(`/topics/${topic.slug}`)} data-tilt>
+  <span class="topic-emoji" aria-hidden="true">{topic.emoji}</span>
+  <h3 transition:name={`topic-${topic.slug}`}>{topic.name}</h3>
+  <p>{topic.description}</p>
+  <span class="topic-foot">
+    <span class="chip">{count} {count === 1 ? 'post' : 'posts'}</span>
+    <span class="arrow">→</span>
+  </span>
+</a>
+
+<style>
+  .topic-card { position: relative; overflow: hidden; transform-style: preserve-3d; will-change: transform; }
+  .topic-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 0.3s;
+    background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%);
+  }
+  .topic-card:hover::before { opacity: 1; }
+  .topic-card > * { position: relative; z-index: 1; }
+  .topic-emoji {
+    display: inline-grid; place-items: center; width: 52px; height: 52px; font-size: 1.6rem;
+    border-radius: 14px; background: var(--bg-soft); border: 1px solid var(--border);
+    transition: transform 0.4s cubic-bezier(.2,.7,.2,1.4);
+  }
+  .topic-card:hover .topic-emoji { transform: scale(1.12) rotate(-8deg); }
+  h3 { margin: 18px 0 6px; font-size: 1.3rem; }
+  p { margin: 0 0 20px; color: var(--muted); }
+  .topic-foot { display: flex; justify-content: space-between; align-items: center; }
+  .arrow { font-size: 1.3rem; color: var(--accent); transition: transform 0.25s; }
+  .topic-card:hover .arrow { transform: translateX(6px); }
+</style>
+
+<script>
+  // Subtle 3D tilt + spotlight following the cursor.
+  function tilt() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover: hover)').matches) return;
+    document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((card) => {
+      if (card.dataset.tiltReady) return;
+      card.dataset.tiltReady = '1';
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        card.style.setProperty('--mx', `${x * 100}%`);
+        card.style.setProperty('--my', `${y * 100}%`);
+        card.style.transform = `perspective(800px) rotateX(${(0.5 - y) * 6}deg) rotateY(${(x - 0.5) * 8}deg) translateY(-4px)`;
+      });
+      card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+    });
+  }
+  document.addEventListener('astro:page-load', tilt);
+</script>

@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import TopicCard from '../components/TopicCard.astro';
+import PostList from '../components/PostList.astro';
+import { site, topics } from '../data/site';
+import { getPosts, url } from '../utils';
+
+const posts = await getPosts();
+const count = (slug: string) => posts.filter((p) => p.data.topic === slug).length;
+---
+<Base>
+  <Hero />
+
+  <section class="section" id="about">
+    <div class="container about">
+      <div class="reveal">
+        <p class="eyebrow">About me</p>
+        <h2>A little bit about me</h2>
+      </div>
+      <div class="about-body">
+        {site.bio.map((para) => <p class="reveal">{para}</p>)}
+        <div class="skills reveal">
+          {site.skills.map((s) => <span class="chip">{s}</span>)}
+        </div>
+        <div class="reveal" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:24px">
+          {site.links.map((l) => <a class="btn" href={l.href} target="_blank" rel="noopener">{l.label} ↗</a>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><p class="eyebrow">What I write about</p><h2>Topics I find interesting</h2></div>
+        <a href={url('/topics')}>All topics →</a>
+      </div>
+      <div class="grid">
+        {topics.map((t) => <TopicCard topic={t} count={count(t.slug)} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container narrow">
+      <div class="section-head reveal">
+        <div><p class="eyebrow">Fresh off the press</p><h2>Latest posts</h2></div>
+        <a href={url('/posts')}>All posts →</a>
+      </div>
+      <PostList posts={posts.slice(0, 4)} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about { display: grid; grid-template-columns: 1fr 1.6fr; gap: 48px; }
+  .about h2 { font-size: clamp(1.8rem, 3.4vw, 2.6rem); margin: 6px 0 0; }
+  .about-body p { margin: 0 0 16px; font-size: 1.1rem; }
+  .skills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .alt { background: var(--bg-soft); border-block: 1px solid var(--border); }
+  @media (max-width: 800px) { .about { grid-template-columns: 1fr; gap: 16px; } }
+</style>

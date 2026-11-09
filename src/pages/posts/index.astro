@@ -1,0 +1,17 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts } from '../../utils';
+const posts = await getPosts();
+---
+<Base title="All posts" description="Everything I have written.">
+  <section class="section">
+    <div class="container narrow">
+      <div class="reveal">
+        <p class="eyebrow">Archive</p>
+        <h1 style="font-size:clamp(2.2rem,5vw,3.4rem);margin:6px 0 32px">All posts</h1>
+      </div>
+      <PostList posts={posts} />
+    </div>
+  </section>
+</Base>
